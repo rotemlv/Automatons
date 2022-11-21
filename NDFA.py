@@ -1,9 +1,9 @@
 import copy
 from random import randint
-from DFA import DeterministicFiniteAutomaton, random_word
+from DFA import DFA, random_word
 
 
-class NonDeterministicAutomaton(DeterministicFiniteAutomaton):
+class NDFA(DFA):
     def __init__(self, language: set = None):
         super().__init__(language)
 

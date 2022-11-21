@@ -1,10 +1,12 @@
 import copy
 import random
 from collections.abc import Hashable, Callable
+
+
 # import tqdm
 
 
-class DeterministicFiniteAutomaton:
+class DFA:
     # automata represented as a "graph" over a language
     language: set
     states: set
@@ -12,7 +14,7 @@ class DeterministicFiniteAutomaton:
     delta: dict
     accepting_states: set
 
-    def __init__(self, language=None):
+    def __init__(self, language: set or None = None):
         self.language = language if language is not None else set()
         self.states = set()
         self.delta = {}
@@ -33,6 +35,7 @@ class DeterministicFiniteAutomaton:
         self.accepting_states.add(state)
 
     def add_state_with_delta(self, state: Hashable, delta_for_state: dict):
+        """Add a state (Hashable) with a delta function (dict) for it."""
         # check format of delta
         assert (len(key) == 2 and key[0] in self.states for key in delta_for_state.keys())
         # delta must be of the form dict[state, letter] = any_state FOR EACH LETTER in alphabet
@@ -47,9 +50,26 @@ class DeterministicFiniteAutomaton:
         self.states.add(state)
         self.delta = {**self.delta, **delta_for_state}
 
+    def add_letter_with_delta(self, letter: Hashable, delta_for_letter: dict):
+        """Add a letter (Hashable) and delta for the specific letter (for all states)"""
+        # check if letter already exists
+        assert letter not in self.language
+        # check format of delta - verify delta does not contain existing letters
+        assert (len(key) == 2 and
+                key[0] in self.states and
+                key[1] not in self.language for key in delta_for_letter.keys())
+        # check that all states' paths (reading the new letter) have been covered
+        tmp = set([d[0] for d in delta_for_letter.keys()])
+        for state in self.states:
+            assert state in tmp
+            # check that there are no artifacts
+            assert self.delta.get((state, letter)) is None
+        # add the letter
+        self.language.add(letter)
+        self.delta = {**self.delta, **delta_for_letter}
+
     def add_delta(self, delta: dict):
         for elem in delta.keys():
-
             # check we didn't add a traversal from the same state and letter before
             assert self.delta.get(elem) is None
             # check that all states are there
@@ -114,3 +134,18 @@ def check_if_word_is_a_odd_b_odd_str(word: str):
     if (len(supposed_a_segment) % 2 == 0) or (len(supposed_b_segment) % 2 == 0):
         return False
     return True
+
+
+# a very simple example that tests the new function
+# if __name__ == '__main__':
+#     A = DFA()
+#     A.add_state(0)
+#     A.add_state(1)
+#     A.set_accepting_state(1)
+#     A.add_letter_with_delta('a', {(0,'a'):1,(1,'a'):0})
+#     A.add_letter_with_delta('b', {(0,'b'):0,(1,'b'):1})
+#     for w in set([random_word(A.language, random.randint(0,10)) for _ in range(100)]):
+#         if A.check_if_word_in_automata_s_language(w):
+#             print(f"Word {w} accepted by A")
+#         else:
+#             print(f"Word {w} NOT accepted by A")

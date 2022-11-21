@@ -1,6 +1,6 @@
 from random import randint
 from DFA import random_word
-from NDFA import NonDeterministicAutomaton
+from NDFA import NDFA
 
 WORD_MIN_SIZE = 0
 WORD_MAX_SIZE = 12
@@ -9,7 +9,7 @@ WORD_MAX_SIZE = 12
 if __name__ == '__main__':
     # defines an NDFA that accepts words starting with 'a' which have at least
     # 1 'a' between every two 'b's
-    NA = NonDeterministicAutomaton({'a', 'b'})
+    NA = NDFA({'a', 'b'})
     NA.add_state(0)
     NA.add_state(1)
     NA.set_accepting_state(0)
