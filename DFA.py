@@ -79,7 +79,8 @@ class DFA:
         # add delta
         self.delta = {**self.delta, **delta}
 
-    def traverse(self, word: str):
+    def traverse_old(self, word: str):
+        """Old version"""
         assert all(letter in self.language for letter in word)
         state = self.initial_state
         consumable_word = copy.copy(word)
@@ -89,11 +90,23 @@ class DFA:
             consumable_word = consumable_word[1:]
             print(f"reading letter: {t}", end='; ')
             state = self.delta[(state, t)]
-            print(f"moved to state {state}")
+            print(f"Automaton moved to state {state}")
         print(f"Finished reading {word}, final state: {state}")
 
-    def traverse_silent_return_state(self, word: str):
-        """Automata traverses the word and returns the word's final state"""
+    def traverse(self, word: str):
+        assert all(letter in self.language for letter in word)
+        state = self.initial_state
+        for idx in range(len(word)):
+            print(f"state before reading: {state}", end='; ')
+            t = word[idx]
+            print(f"reading letter: {t}", end='; ')
+            state = self.delta[(state, t)]
+            print(f"Automaton moved to state {state}")
+        print(f"Finished reading {word}, final state: {state}")
+
+    def traverse_silent_return_state_old(self, word: str):
+        """Old version:
+        Automata traverses the word and returns the word's final state"""
         assert all(letter in self.language for letter in word)
         state = self.initial_state
         consumable_word = copy.copy(word)
@@ -101,6 +114,14 @@ class DFA:
             t = consumable_word[0]
             consumable_word = consumable_word[1:]
             state = self.delta[(state, t)]
+        return state
+
+    def traverse_silent_return_state(self, word: str):
+        """Automata traverses the word and returns the word's final state"""
+        assert all(letter in self.language for letter in word)
+        state = self.initial_state
+        for idx in range(len(word)):
+            state = self.delta[(state, word[idx])]
         return state
 
     def check_if_word_in_automata_s_language(self, word: str):
@@ -115,10 +136,10 @@ def random_word(language: set, length: int):
     return "".join((letters[random.randint(0, last_idx)] for _ in range(length)))
 
 
-def independent_language_check(regular_expression: Callable, word: str):
+def independent_language_check(regular_language_checker: Callable, word: str):
     """Code a test for a word's presence in a language.
         Call this to test the returns of an automata which rolls over millions of words."""
-    return regular_expression(word)
+    return regular_language_checker(word)
 
 
 def check_if_word_is_a_odd_b_odd_str(word: str):
@@ -131,7 +152,8 @@ def check_if_word_is_a_odd_b_odd_str(word: str):
     if 'a' in supposed_b_segment:
         return False
     # 'a' count and 'b' count must be odd
-    if (len(supposed_a_segment) % 2 == 0) or (len(supposed_b_segment) % 2 == 0):
+    if (len(supposed_a_segment) % 2 == 0) or \
+            (len(supposed_b_segment) % 2 == 0):
         return False
     return True
 

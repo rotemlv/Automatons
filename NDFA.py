@@ -29,7 +29,6 @@ class NDFA(DFA):
                                 " (state, letter) -> <list of states>")
             # grab a random state from the dict
             state = rnd_state
-
             print(f"moved to state {state}")
         print(f"Finished reading {input_word}, final state: {state}")
         if is_stuck:
